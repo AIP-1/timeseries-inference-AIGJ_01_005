@@ -1,0 +1,31 @@
+공간,항목,기기,범위밖,튐,최장_같은값_분
+사무실,co2,AM103-081175,0,0,3
+사무실,humidity,AM103-081175,0,0,222
+사무실,humidity,EM320-TH-389010,0,0,214
+사무실,temperature,AM103-081175,0,0,117
+사무실,temperature,EM320-TH-389010,0,0,97
+사무실 밖,humidity,EM300-TH-151836,0,0,49
+사무실 밖,temperature,EM300-TH-151836,0,0,12
+실습실,co2,AM107-067999,0,0,5
+실습실,co2,AM107-140101,0,0,30
+실습실,co2,EM500-CO2-152590,0,0,2
+실습실,co2,EM500-CO2-152862,0,0,4
+실습실,humidity,AM107-067999,0,0,179
+실습실,humidity,AM107-140101,0,0,310
+실습실,humidity,EM300-TH-151523,0,0,30
+실습실,humidity,EM300-TH-151547,0,0,266
+실습실,humidity,EM300-TH-151606,0,0,170
+실습실,humidity,EM320-TH-389818,0,0,223
+실습실,humidity,EM500-CO2-152590,0,0,256
+실습실,humidity,EM500-CO2-152862,0,0,203
+실습실,temperature,AM107-067999,0,0,26
+실습실,temperature,AM107-140101,0,0,110
+실습실,temperature,EM300-TH-151523,0,0,20
+실습실,temperature,EM300-TH-151547,0,0,17
+실습실,temperature,EM300-TH-151606,0,0,17
+실습실,temperature,EM320-TH-389818,0,0,91
+실습실,temperature,EM500-CO2-152590,0,0,26
+실습실,temperature,EM500-CO2-152862,0,0,18
+회의실,co2,AM103-089152,0,0,10
+회의실,humidity,AM103-089152,0,0,140
+회의실,temperature,AM103-089152,0,0,150

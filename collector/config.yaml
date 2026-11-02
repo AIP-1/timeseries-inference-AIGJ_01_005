@@ -1,0 +1,97 @@
+# =============================================================
+#  센서 데이터 수집기 설정
+#  - 새 센서가 생기거나 메시지 형식이 바뀌면 이 파일만 고칩니다.
+#  - ${이름} 은 .env 파일(또는 환경변수)의 값으로 바뀝니다.
+# =============================================================
+
+mqtt:
+  host: data.withio.net
+  port: 1883
+  username: ${MQTT_USERNAME}
+  password: ${MQTT_PASSWORD}
+  client_id: collector-${USER}      # 브로커 안에서 겹치지 않는 이름
+  topics: ["#"]                     # 전부 구독 (규칙에 없는 토픽도 원본은 저장됨)
+  qos: 1
+  keepalive: 30                     # 초. 끊김을 이 시간 안에 알아챔
+
+storage:
+  sqlite_path: data/collector.db    # 원본 + 정리된 측정값 + InfluxDB 전송 대기열
+  keep_raw: true                    # 원본 메시지 보관 (규칙을 바꾼 뒤 다시 처리할 때 사용)
+
+postgres:                           # Crowfoot 에서 발급받은 내 PostgreSQL 스키마
+  enabled: true
+  host: s3.java21.net               # 와이파이(외부망) 경로. 랜선 쪽을 쓰려면 10.116.64.13
+  port: 8000
+  dbname: nhnacademy
+  user: cf_u35_d2
+  password: ${PG_PASSWORD}          # .env 에 저장
+  schema: cf_u35_d2
+  table: measurements               # 처음 접속할 때 없으면 자동으로 만듦
+  batch_size: 1000
+  flush_interval_sec: 5
+  connect_timeout: 10
+
+influx:                             # 강사님 공용 버킷(읽기 전용)이라 전송하지 않음
+  enabled: false
+  url: http://10.116.64.13:8086
+  org: "33e75366a5081f13"
+  bucket: "iot-bucket"
+  token: ${INFLUX_TOKEN}
+  measurement: sensor               # InfluxDB 측정 이름
+  batch_size: 1000
+  flush_interval_sec: 5
+
+# 처리하지 않고 버릴 토픽 (원본도 저장 안 함)
+ignore:
+  - gateway/#                       # 게이트웨이 상태 (바이너리)
+
+# -------------------------------------------------------------
+#  파싱 규칙: 위에서부터 먼저 맞는 규칙 하나만 적용
+#
+#  값을 가리키는 방법
+#    deviceInfo.tags.location  → JSON 안의 경로 (점으로 구분, 배열은 숫자)
+#    topic:3                   → 토픽을 / 로 나눈 4번째 조각 (0부터 셈)
+#    $key                      → expand 를 쓸 때 펼친 키 이름
+#    "=실습실"                  → 고정 문자열
+#    여러 개를 [ ] 로 주면 앞에서부터 처음 값이 있는 것을 사용
+#
+#  time.kind : iso(문자열 시각) | epoch_ms | epoch_s | received(수신 시각 사용)
+#  values    : 측정값이 들어 있는 객체. 안의 숫자/불리언 항목이 모두 저장됨
+#  expand    : { 공간이름: {측정값...} } 처럼 키가 공간인 형식을 펼칠 때
+#  dedup     : 같은 메시지(재전송)를 알아보는 기준. 이 값들이 같으면 중복으로 버림
+# -------------------------------------------------------------
+parsers:
+
+  # ① LoRa 센서 (ChirpStack)
+  - name: lora
+    topic: application/+/device/+/event/up
+    time:
+      # time 은 게이트웨이 시계에 따라 5분 틀리는 경우가 있어 네트워크 서버 수신 시각(nsTime)을 우선 사용
+      path: [rxInfo.0.nsTime, time]
+      kind: iso
+    space: deviceInfo.tags.location
+    point: [deviceInfo.tags.point, "=-"]
+    device: deviceInfo.deviceName
+    values: object
+    dedup: [deviceInfo.devEui, fCnt]
+    exclude: [battery]               # 저장하지 않을 항목
+
+  # ② 냉난방기 실내기/실외기 (xflow)
+  - name: hvac
+    topic: xflow/hvacr/+/+/status
+    time: { path: ts, kind: epoch_ms }
+    expand: values                   # {"개발실-실내기": {...}} → 공간 = 개발실-실내기
+    space: $key
+    point: topic:2                   # idu(실내기) / odu(실외기)
+    device: topic:3
+    dedup: [topic:3, ts]
+
+  # ③ 냉난방 컨트롤러
+  - name: controller
+    topic: xflow/controller/+/status
+    time: { path: ts, kind: epoch_ms }
+    expand: values
+    space: "=컨트롤러"
+    point: "=controller"
+    device: topic:2
+    dedup: [topic:2, ts]

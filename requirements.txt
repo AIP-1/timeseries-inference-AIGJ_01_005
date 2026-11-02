@@ -1,0 +1,14 @@
+numpy
+pandas
+matplotlib
+scikit-learn
+torch
+paho-mqtt
+psycopg2-binary
+pyyaml
+psutil
+onnx
+onnxruntime
+skl2onnx
+chronos-forecasting
+hummingbird-ml
