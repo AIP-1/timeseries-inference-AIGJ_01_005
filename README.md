@@ -13,7 +13,11 @@ Jetson Orin Nano Super 한 대에서 **센서 수집 → 60분 예측 → 이상
 | 7 엣지 최적화 | CO2 차이 ≤1ppm, 분류 변화 ≤0.1% | TensorRT FP32 0.294ppm, 분류 변화 0.0% (FP16은 엔진마다 0.564/1.254 → FP32 배포) |
 | 8 상시 서비스 | 12시간 무중단, 장애 시험, API | 17.5시간 가동, 끊김 경보·자동 복구, MQTT·REST API |
 
-심화(B) 결과와 측정 조건은 `report/` 의 최종 결과보고서를 본다.
+## 결과 보고서
+
+📄 **[결과 보고서 (report.md)](report/report.md)** — 과제 1~8 결과표, 측정 조건, 원인 분석, 심화(B) 결과를 정리한 최종 결과 보고서다.
+
+- PDF: [최종 결과보고서](report/timeseries-inference_최종결과보고서.pdf) · [결과 형식 문서](report/timeseries-inference_결과형식문서.pdf)
 
 ## 폴더 구성
 
@@ -25,7 +29,7 @@ Jetson Orin Nano Super 한 대에서 **센서 수집 → 60분 예측 → 이상
 | `models/` | 학습된 모델 |
 | `results/` | 과제별 결과 표(CSV)와 그림 |
 | `docs/` | 실행 화면 캡처 |
-| `report/` | 최종 결과보고서, 결과 형식 문서 (PDF) |
+| `report/` | **결과 보고서 `report.md`**, 최종 결과보고서·결과 형식 문서 (PDF) |
 
 ## 실행
 
